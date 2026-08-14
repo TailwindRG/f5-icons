@@ -13,10 +13,10 @@
     {
       "slug": "products",
       "display": "F5 Products",
-      "description": "Named product marks: BIG-IP, NGINX, Distributed Cloud and platform tooling",
+      "description": "F5 Product icons: BIG-IP, NGINX, Distributed Cloud and platform tooling",
       "from": ["__force_group_only__"],
       "match": [],
-      "_note": "Filled by `organize.py --force-group products` from the product logo export. The unmatchable `from` keeps the prefix rules from ever claiming an icon for it."
+      "_note": "Filled by `organize.py --force-group products` from the F5 Product icons export (brand.f5.com/document/187). The unmatchable `from` keeps the prefix rules from ever claiming an icon for it."
     },
     {
       "slug": "ai",

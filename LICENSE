@@ -28,10 +28,12 @@ The MIT license above applies ONLY to the conversion tooling in `scripts/` and
 to the documentation in this repository.
 
 It does NOT apply to the F5 icon artwork, to any shape library generated from
-that artwork, or to the F5 name, logo, and trademarks. Those remain the
-property of F5, Inc. and are governed by F5's brand guidelines:
+that artwork, or to the F5 name, logo, product names, and trademarks. Those
+remain the property of F5, Inc. and are governed by F5's brand guidelines in
+the F5 Brand Center:
 
-    https://brand.f5.com/document/186
+    Brand icons    https://brand.f5.com/document/186
+    Product icons  https://brand.f5.com/document/187
 
 This project is not affiliated with, endorsed by, or sponsored by F5, Inc.
 Obtain the artwork from F5 directly and use it in accordance with F5's terms.

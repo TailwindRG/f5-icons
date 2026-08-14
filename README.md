@@ -1,13 +1,15 @@
 # F5 Icons for draw.io
 
-Converts the official [F5 brand icon set][f5brand] into
+Converts the official F5 icon artwork — both the [Brand icons][f5brand] and
+the [Product icons][f5product] sets — into
 [draw.io](https://www.drawio.com/) shape libraries — 880 icons across 14
 themed palettes, 875 of them as true recolorable vector stencils. Covers both
 the concept icon set and the named product marks (BIG-IP, NGINX, F5
 Distributed Cloud).
 
 > **Attribution.** The icon artwork is the property of F5, Inc. and comes from
-> the F5 brand portal: <https://brand.f5.com/document/186>. This project is a
+> the F5 Brand Center: Brand icons at <https://brand.f5.com/document/186> and
+> Product icons at <https://brand.f5.com/document/187>. This project is a
 > community conversion tool, not affiliated with, endorsed by, or sponsored by
 > F5. The original SVG files are not committed here, but the generated
 > libraries in `libraries/` do embed F5's icon geometry and are therefore
@@ -42,9 +44,10 @@ fall back to embedded images so they still look exactly right:
 
 ## The libraries
 
-F5 publishes the artwork as two exports: a concept icon set (~800 flat SVGs)
-and a product logo set (78 named product marks). In the concept set, six
-coarse filename prefixes are usable as palettes as-is; `other-` is a 319-icon
+F5 publishes the artwork as two separate downloads: **Brand icons**
+([document 186][f5brand]), ~800 flat concept SVGs, and **Product icons**
+([document 187][f5product]), 78 named product marks. In the brand icon set,
+six coarse filename prefixes are usable as palettes as-is; `other-` is a 319-icon
 grab bag that is impossible to scan, and two prefixes are too small to deserve
 their own palette. This repo regroups everything into 14 libraries of a
 browsable size:
@@ -113,16 +116,18 @@ release from F5. The original SVG export is not committed — you supply it.
 
 ### Steps
 
-1. Download both SVG exports from the F5 brand portal,
-   <https://brand.f5.com/document/186> — the concept icon set and the product
-   logo set.
+1. Download both SVG exports from the F5 Brand Center. They are two separate
+   documents:
+
+   - Brand icons — <https://brand.f5.com/document/186>
+   - Product icons — <https://brand.f5.com/document/187>
 
 2. Unpack them under `source/` (the directory is gitignored). You should end
    up with two folders of flat `*.svg` files, e.g.
-   `source/Icons 2026-08-14 10_43_49/` (concepts) and
-   `source/Icons 2026-08-14 11_08_57/` (products).
+   `source/Icons 2026-08-14 10_43_49/` (brand icons) and
+   `source/Icons 2026-08-14 11_08_57/` (product icons).
 
-3. Stage the concept icons. This rewrites each filename's vendor prefix
+3. Stage the brand icons. This rewrites each filename's vendor prefix
    according to `scripts/taxonomy.json` and copies the result to
    `build/staged/`:
 
@@ -245,7 +250,9 @@ The scripts and documentation in this repository are MIT licensed — see
 The MIT grant does **not** extend to the F5 icon artwork, to any shape library
 generated from it, or to the F5 name and logo. Those remain the property of
 F5, Inc. and are governed by F5's brand guidelines at
-<https://brand.f5.com/document/186>. Obtain the artwork from F5 and use it on
-F5's terms.
+<https://brand.f5.com/document/186> (Brand icons) and
+<https://brand.f5.com/document/187> (Product icons). Obtain the artwork from
+F5 and use it on F5's terms.
 
 [f5brand]: https://brand.f5.com/document/186
+[f5product]: https://brand.f5.com/document/187

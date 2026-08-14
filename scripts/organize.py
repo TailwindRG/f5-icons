@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
 """
-organize.py - Stage the flat F5 icon export into draw.io library groups.
+organize.py - Stage the flat F5 icon exports into draw.io library groups.
 
-The vendor ships one directory of ~800 SVGs whose filenames carry a coarse
-prefix: ai-, delivery-, deployment-, industry-, other-, platformadsp-,
-security-, xops-. Six of those are usable palettes as-is. `other-` is a
-319-icon grab bag that nobody can scan, and two of them are too small to
-deserve their own palette.
+F5 publishes the artwork as two downloads from the Brand Center:
+
+    Brand icons    https://brand.f5.com/document/186    ~800 concept SVGs
+    Product icons  https://brand.f5.com/document/187    78 product marks
+
+Brand icon filenames carry a coarse prefix: ai-, delivery-, deployment-,
+industry-, other-, platformadsp-, security-, xops-. Six of those are usable
+palettes as-is. `other-` is a 319-icon grab bag that nobody can scan, and two
+of them are too small to deserve their own palette.
 
 This script rewrites the prefixes according to taxonomy.json and copies the
 result into a staging directory. svg2drawio.py then picks the new prefixes up
-as categories with no changes of its own:
+as categories with no changes of its own.
 
-    python3 scripts/organize.py "source/Icons ..." -o build/staged
-    python3 scripts/svg2drawio.py build/staged -o libraries --name f5 \\
-        --per-category
+Product icons are one coherent set rather than something the prefix rules
+should sort, so they are forced into a single group. Their filenames reuse the
+same functional prefixes as the brand icons, which would otherwise show up in
+the shape names, so those get stripped:
+
+    python3 organize.py "source/Icons ...10_43_49" -o build/staged
+    python3 organize.py "source/Icons ...11_08_57" -o build/staged --append \\
+        --force-group products --strip-prefix delivery,security,deployment,xops
+    python3 svg2drawio.py build/staged -o libraries --name f5 --per-category
 
 Standard library only.
 
@@ -102,7 +112,7 @@ def main():
     ap.add_argument("--force-group", metavar="SLUG",
                     help="Put every icon from this source in SLUG, ignoring "
                          "the taxonomy rules. For sources that are one "
-                         "coherent set, such as the product logo export.")
+                         "coherent set, such as the Product icons export.")
     ap.add_argument("--strip-prefix", default="",
                     help="Comma-separated prefixes to drop from filenames "
                          "before staging, e.g. delivery,security. Only "
