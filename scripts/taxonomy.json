@@ -11,6 +11,14 @@
   "fallback": "symbols",
   "groups": [
     {
+      "slug": "products",
+      "display": "F5 Products",
+      "description": "Named product marks: BIG-IP, NGINX, Distributed Cloud and platform tooling",
+      "from": ["__force_group_only__"],
+      "match": [],
+      "_note": "Filled by `organize.py --force-group products` from the product logo export. The unmatchable `from` keeps the prefix rules from ever claiming an icon for it."
+    },
+    {
       "slug": "ai",
       "display": "F5 AI",
       "description": "AI factories, gateways, guardrails, inference and model operations",

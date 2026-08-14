@@ -1,8 +1,10 @@
 # F5 Icons for draw.io
 
 Converts the official [F5 brand icon set][f5brand] into
-[draw.io](https://www.drawio.com/) shape libraries — 802 icons across 13
-themed palettes, 797 of them as true recolorable vector stencils.
+[draw.io](https://www.drawio.com/) shape libraries — 880 icons across 14
+themed palettes, 875 of them as true recolorable vector stencils. Covers both
+the concept icon set and the named product marks (BIG-IP, NGINX, F5
+Distributed Cloud).
 
 > **Attribution.** The icon artwork is the property of F5, Inc. and comes from
 > the F5 brand portal: <https://brand.f5.com/document/186>. This project is a
@@ -28,7 +30,7 @@ instead. The practical difference:
 | Respects diagram themes | Yes | No |
 | Editable outline / stroke | Yes | No |
 
-797 of the 802 icons convert to stencils. The remaining 5 use SVG features
+875 of the 880 icons convert to stencils. The remaining 5 use SVG features
 that have no stencil equivalent (a non-`none` stroke, or partial opacity) and
 fall back to embedded images so they still look exactly right:
 
@@ -40,10 +42,12 @@ fall back to embedded images so they still look exactly right:
 
 ## The libraries
 
-The vendor ships one flat folder of ~800 SVGs. Six coarse prefixes are usable
-as palettes as-is; `other-` is a 319-icon grab bag that is impossible to scan,
-and two prefixes are too small to deserve their own palette. This repo
-regroups them into 13 libraries of a browsable size:
+F5 publishes the artwork as two exports: a concept icon set (~800 flat SVGs)
+and a product logo set (78 named product marks). In the concept set, six
+coarse filename prefixes are usable as palettes as-is; `other-` is a 319-icon
+grab bag that is impossible to scan, and two prefixes are too small to deserve
+their own palette. This repo regroups everything into 14 libraries of a
+browsable size:
 
 | Library | Icons | Contents |
 | --- | --- | --- |
@@ -52,6 +56,7 @@ regroups them into 13 libraries of a browsable size:
 | `f5-deployment.xml` | 91 | Cloud, multicloud, data centre, hardware and virtual form factors |
 | `f5-delivery.xml` | 85 | Load balancing, DNS, traffic management, Kubernetes, platform value |
 | `f5-people.xml` | 81 | User roles, personas, support, training, professional services |
+| `f5-products.xml` | 78 | Named product marks: BIG-IP, NGINX, Distributed Cloud, platform tooling |
 | `f5-ai.xml` | 64 | AI factories, gateways, guardrails, inference, model operations |
 | `f5-devices.xml` | 51 | Laptops, desktops, phones, tablets, wearables, endpoints |
 | `f5-business.xml` | 48 | Industry verticals, currency, commerce, buildings, transport |
@@ -60,9 +65,9 @@ regroups them into 13 libraries of a browsable size:
 | `f5-apps.xml` | 33 | Application lifecycle, tiers, modernisation, migration, code |
 | `f5-data.xml` | 21 | Graphs, dashboards, databases, metrics, targets, planning |
 | `f5-network.xml` | 20 | Wi-Fi, cellular, addressing, satellite, fibre, internet reach |
-| `f5.xml` | 802 | Everything, in one library |
+| `f5.xml` | 880 | Everything, in one library |
 
-Load the themed libraries you need rather than `f5.xml` — an 802-shape palette
+Load the themed libraries you need rather than `f5.xml` — an 880-shape palette
 is slow to scan and slow to search.
 
 ## Installing a library
@@ -108,14 +113,16 @@ release from F5. The original SVG export is not committed — you supply it.
 
 ### Steps
 
-1. Download the icon set from the F5 brand portal:
-   <https://brand.f5.com/document/186>. Take the SVG export.
+1. Download both SVG exports from the F5 brand portal,
+   <https://brand.f5.com/document/186> — the concept icon set and the product
+   logo set.
 
-2. Unpack it under `source/` (the directory is gitignored). You should end up
-   with a folder of flat `*.svg` files, e.g.
-   `source/Icons 2026-08-14 10_43_49/`.
+2. Unpack them under `source/` (the directory is gitignored). You should end
+   up with two folders of flat `*.svg` files, e.g.
+   `source/Icons 2026-08-14 10_43_49/` (concepts) and
+   `source/Icons 2026-08-14 11_08_57/` (products).
 
-3. Stage the icons into groups. This rewrites each filename's vendor prefix
+3. Stage the concept icons. This rewrites each filename's vendor prefix
    according to `scripts/taxonomy.json` and copies the result to
    `build/staged/`:
 
@@ -123,13 +130,27 @@ release from F5. The original SVG export is not committed — you supply it.
    python3 scripts/organize.py "source/Icons 2026-08-14 10_43_49" -o build/staged
    ```
 
-4. Build the libraries:
+4. Add the product marks to the same staging directory. They are one coherent
+   set rather than something the prefix rules should sort, so they are forced
+   into a single group. Their filenames carry the same functional prefixes as
+   the concept icons (`delivery-`, `security-`, …), which would otherwise end
+   up in the shape names, so those are stripped:
+
+   ```bash
+   python3 scripts/organize.py "source/Icons 2026-08-14 11_08_57" -o build/staged \
+       --append --force-group products \
+       --strip-prefix delivery,security,deployment,xops
+   ```
+
+5. Build the libraries:
 
    ```bash
    python3 scripts/svg2drawio.py build/staged -o libraries --name f5 --per-category
    ```
 
-You now have `libraries/f5.xml` plus one file per group.
+You now have `libraries/f5.xml` plus one file per group. `organize.py` refuses
+to stage if two icons would land on the same filename, so a clean run means
+the two sources merged without collisions.
 
 ### Inspecting before you commit
 
@@ -148,10 +169,21 @@ python3 scripts/svg2drawio.py build/staged --report
 
 | File | Purpose |
 | --- | --- |
-| `scripts/organize.py` | Regroups the flat vendor export using `taxonomy.json` |
+| `scripts/organize.py` | Regroups the vendor exports using `taxonomy.json` |
 | `scripts/taxonomy.json` | The group definitions and filename-matching rules |
 | `scripts/svg2drawio.py` | Converts staged SVGs into draw.io shape libraries |
 | `scripts/svgpath.py` | SVG path parser and `mxStencil` path emitter |
+
+### `organize.py` options
+
+| Flag | Default | Effect |
+| --- | --- | --- |
+| `-o`, `--out` | `build/staged` | Staging directory |
+| `--taxonomy` | `scripts/taxonomy.json` | Group definitions to apply |
+| `--force-group` | off | Assign every icon in this source to one group, ignoring the rules |
+| `--strip-prefix` | none | Comma-separated prefixes to drop from filenames; needs `--force-group` |
+| `--append` | off | Add to an existing staging directory instead of clearing it |
+| `--report` | off | Print the assignment table, write nothing |
 
 ### `svg2drawio.py` options
 

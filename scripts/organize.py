@@ -99,6 +99,17 @@ def main():
                     help="Vendor icon directory or .zip")
     ap.add_argument("-o", "--out", type=Path, default=Path("build/staged"))
     ap.add_argument("--taxonomy", type=Path, default=DEFAULT_TAXONOMY)
+    ap.add_argument("--force-group", metavar="SLUG",
+                    help="Put every icon from this source in SLUG, ignoring "
+                         "the taxonomy rules. For sources that are one "
+                         "coherent set, such as the product logo export.")
+    ap.add_argument("--strip-prefix", default="",
+                    help="Comma-separated prefixes to drop from filenames "
+                         "before staging, e.g. delivery,security. Only "
+                         "meaningful with --force-group.")
+    ap.add_argument("--append", action="store_true",
+                    help="Add to an existing staging directory instead of "
+                         "clearing it, so several sources can be combined")
     ap.add_argument("--report", action="store_true",
                     help="Print the assignment table, write nothing")
     args = ap.parse_args()
@@ -108,13 +119,29 @@ def main():
     if not assets:
         sys.exit("error: no SVGs found")
 
+    strip = [p.strip().lower() for p in args.strip_prefix.split(",") if p.strip()]
+    if strip and not args.force_group:
+        sys.exit("error: --strip-prefix only applies with --force-group")
+
     display = {g["slug"]: g.get("display", g["slug"]) for g in groups}
+    if args.force_group and args.force_group not in display:
+        sys.exit(f"error: --force-group '{args.force_group}' is not a group "
+                 f"in {args.taxonomy.name}")
+
     rows, tally, unmatched = [], Counter(), []
     for stem, suffix, raw in assets:
-        slug, rest = assign(stem, groups, fallback)
+        if args.force_group:
+            slug, rest = args.force_group, stem
+            for p in strip:
+                if rest.lower().startswith(p + "-"):
+                    rest = rest[len(p) + 1:]
+                    break
+        else:
+            slug, rest = assign(stem, groups, fallback)
         if slug is None:
             unmatched.append(stem)
             continue
+        rest = re.sub(r"[\s_]+", "-", rest).strip("-")
         tally[slug] += 1
         rows.append((slug, f"{slug}-{rest}{suffix}", stem, raw))
 
@@ -135,14 +162,16 @@ def main():
         sys.exit(f"error: {len(unmatched)} icons matched no group and no "
                  f"fallback is set; first: {unmatched[0]}")
 
-    if args.out.exists():
+    if args.out.exists() and not args.append:
         shutil.rmtree(args.out)
-    args.out.mkdir(parents=True)
+    args.out.mkdir(parents=True, exist_ok=True)
 
     collisions = Counter(n for _, n, _, _ in rows)
+    if args.append:
+        collisions.update(p.name for p in args.out.glob("*.svg"))
     dupes = [n for n, c in collisions.items() if c > 1]
     if dupes:
-        sys.exit(f"error: staged filename collision: {dupes[:5]}")
+        sys.exit(f"error: staged filename collision: {sorted(dupes)[:5]}")
 
     for _, newname, _, raw in rows:
         (args.out / newname).write_bytes(raw)

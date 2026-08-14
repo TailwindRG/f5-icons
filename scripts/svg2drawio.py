@@ -82,7 +82,14 @@ ACRONYMS = {
     # general
     "atm": "ATM", "b2b": "B2B", "id": "ID", "it": "IT", "php": "PHP",
     "sql": "SQL", "us": "US", "vr": "VR",
+    # product marks
+    "as3": "AS3", "cgnat": "CGNAT", "dlp": "DLP", "dos": "DoS", "pem": "PEM",
+    "ve": "VE", "nginxaas": "NGINXaaS", "bigiq": "BIG-IQ", "aas": "aaS",
 }
+
+# Lowercased mid-title, never as the first word. Standard title case.
+SMALL_WORDS = {"a", "an", "and", "as", "at", "but", "by", "for", "from", "in",
+               "nor", "of", "on", "or", "per", "the", "to", "via", "with"}
 PHRASE_FIXUPS = [
     # branding
     (r"\bBig[- ]?IP\b", "BIG-IP"),
@@ -94,6 +101,12 @@ PHRASE_FIXUPS = [
     (r"\bTLS SSL\b", "TLS/SSL"),
     (r"\bFirewall WAF\b", "Firewall (WAF)"),
     (r"\bQuestionmark\b", "Question Mark"),
+    # product marks the word-level table cannot reach
+    (r"\bBig Iq\b", "BIG-IQ"),
+    (r"\bNGINX aaS\b", "NGINXaaS"),
+    (r"\bApplication Services 3 AS3\b", "Application Services 3 (AS3)"),
+    (r"\bClient Side Defense\b", "Client-Side Defense"),
+    (r"\bAll Up\b", "(full lockup)"),
     # vendor filename typos
     (r"\bIntegretion\b", "Integration"),
     (r"\bMicroservoces\b", "Microservices"),
@@ -103,9 +116,12 @@ PHRASE_FIXUPS = [
     (r"\bCinsolidate\b", "Consolidate"),
     (r"\bSheild\b", "Shield"),
     (r"\bLoad0\b", "Load"),
-    # vendor filename asides
-    (r"\(Usually Use For VELOS\)", "(VELOS)"),
-    (r"\(Usually Use For R Series\)", "(rSeries)"),
+    # vendor filename asides. Match "for" case-insensitively: SMALL_WORDS
+    # lowercases it mid-title, and these ran before that rule existed.
+    (r"\(Usually Use [Ff]or VELOS\)", "(VELOS)"),
+    (r"\(Usually Use [Ff]or R Series\)", "(rSeries)"),
+    # hyphenated compounds the word-level pass splits
+    (r"\bAdd on\b", "Add-On"),
 ]
 STRIP_PREFIXES = ("icon-", "icon_", "ico-", "ico_")
 
@@ -434,7 +450,7 @@ def prettify(stem: str) -> str:
     s = re.sub(r"\s*(@\d+x|copy|\d+\s*px)$", "", s, flags=re.I).strip()
 
     out = []
-    for word in s.split(" "):
+    for idx, word in enumerate(s.split(" ")):
         # Peel surrounding brackets so "(edr)" still hits the acronym table.
         m = re.fullmatch(r"([(\[]*)([^\s()\[\]]*)([)\]]*)", word)
         pre, core, post = m.groups() if m else ("", word, "")
@@ -443,6 +459,8 @@ def prettify(stem: str) -> str:
             fixed = ACRONYMS[key]
         elif core in ("/", "&"):
             fixed = core
+        elif idx and key in SMALL_WORDS:
+            fixed = key
         elif core.isupper() and len(core) > 1:
             fixed = core
         elif len(core) > 1 and any(c.isupper() for c in core[1:]):
