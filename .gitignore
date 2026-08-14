@@ -1,0 +1,12 @@
+# Vendor artwork — download separately from https://brand.f5.com/document/186
+/source/
+
+# Build staging
+/build/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store

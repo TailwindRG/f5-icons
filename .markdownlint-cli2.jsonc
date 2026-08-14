@@ -1,0 +1,9 @@
+{
+  "config": {
+    // Tables and URLs cannot be wrapped at 80 columns without becoming
+    // unreadable. Prose in this repo is hand-wrapped at 79 anyway.
+    "MD013": false
+  },
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules", "build", "source"]
+}
